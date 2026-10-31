@@ -1,117 +1,13 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="hi">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#173b32">
-<title>PatnaKart — Local Shopping</title>
-<style>
-:root{--green:#173b32;--mint:#e9f3ed;--orange:#f2a34a;--ink:#17231f;--muted:#68756f;--line:#e5ebe7;--white:#fff}
-*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#f6f8f6;color:var(--ink)}
-header{background:var(--green);color:white;padding:18px 16px 22px;border-radius:0 0 22px 22px}
-.top{display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{font-size:22px;font-weight:800}.city{font-size:12px;opacity:.85}
-.tag{font-size:12px;background:#ffffff20;padding:7px 10px;border-radius:20px}
-h1{font-size:24px;line-height:1.2;margin:22px 0 8px}header p{font-size:13px;margin:0;opacity:.88}
-main{max-width:760px;margin:auto;padding:14px}
-.search{width:100%;padding:14px 15px;border:1px solid var(--line);border-radius:13px;font-size:15px;background:white;margin:2px 0 14px}
-.cats{display:flex;gap:8px;overflow:auto;padding:2px 0 14px}
-.cat{border:1px solid var(--line);background:white;padding:9px 13px;border-radius:22px;white-space:nowrap;font-size:13px}
-.cat.active{background:var(--green);color:white;border-color:var(--green)}
-.sectionhead{display:flex;justify-content:space-between;align-items:center;margin:8px 0 12px}.sectionhead h2{font-size:18px;margin:0}.small{font-size:12px;color:var(--muted)}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
-.product{background:white;border:1px solid var(--line);border-radius:15px;overflow:hidden}
-.pic{height:112px;background:var(--mint);display:flex;align-items:center;justify-content:center;font-size:42px}
-.info{padding:11px}.name{font-weight:700;font-size:14px}.desc{font-size:11px;color:var(--muted);margin:4px 0 9px;min-height:28px}
-.buyrow{display:flex;align-items:center;justify-content:space-between;gap:6px}.price{font-weight:800;font-size:15px}
-button{cursor:pointer;font:inherit}.add{border:0;background:var(--green);color:white;border-radius:9px;padding:8px 12px;font-size:12px;font-weight:700}
-.panel{background:white;border:1px solid var(--line);border-radius:15px;padding:14px;margin-top:16px}
-.panel h2{font-size:17px;margin:0 0 10px}.cartline{display:flex;justify-content:space-between;align-items:center;gap:8px;border-bottom:1px solid var(--line);padding:9px 0;font-size:13px}
-.qty{display:flex;align-items:center;gap:8px}.qty button{border:1px solid var(--line);background:white;border-radius:7px;width:27px;height:27px}
-.total{display:flex;justify-content:space-between;font-weight:800;padding:12px 0}
-input,select,textarea{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;font:inherit;margin:5px 0 9px;background:white}
-label{font-size:12px;color:var(--muted)}.order{width:100%;border:0;background:#16834d;color:white;padding:14px;border-radius:11px;font-weight:800}
-.note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:9px}
-footer{text-align:center;padding:22px;color:var(--muted);font-size:11px}
-.empty{color:var(--muted);font-size:13px;padding:10px 0}
-@media(min-width:600px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}.pic{height:135px}}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PatnaKart - पटना का अपना ऑनलाइन बाजार</title>
+  <meta http-equiv="refresh" content="0; url=patnakart_step3_categories-1.html">
 </head>
 <body>
-<header>
- <div class="top"><div><div class="brand" id="brand">PatnaKart</div><div class="city">पटना, बिहार</div></div><div class="tag">स्थानीय डिलीवरी</div></div>
- <h1>पटना का बाजार, अब आपके मोबाइल पर!</h1>
- <p>खाना, कपड़े और रोज़मर्रा के सामान — एक ही जगह से ऑर्डर करें।</p>
-</header>
-<main>
- <input class="search" id="search" placeholder="प्रोडक्ट खोजें… जैसे पिज़्ज़ा, शर्ट" oninput="render()">
- <div class="cats" id="cats"></div>
- <div class="sectionhead"><h2>आज के प्रोडक्ट</h2><span class="small" id="count"></span></div>
- <div class="grid" id="products"></div>
- <section class="panel">
-  <h2>आपका कार्ट <span class="small" id="cartCount"></span></h2>
-  <div id="cart"><div class="empty">अभी कार्ट खाली है। प्रोडक्ट पर Add दबाएँ।</div></div>
-  <div class="total"><span>कुल रकम</span><span id="total">₹0</span></div>
-  <h2>ऑर्डर की जानकारी</h2>
-  <label>आपका नाम</label><input id="customer" placeholder="पूरा नाम">
-  <label>मोबाइल नंबर</label><input id="phone" inputmode="tel" placeholder="10 अंकों का नंबर">
-  <label>डिलीवरी का पता (पटना)</label><textarea id="address" rows="2" placeholder="मोहल्ला, सड़क, मकान नंबर"></textarea>
-  <label>ऑर्डर का तरीका</label><select id="payment"><option>Cash on Delivery</option><option>UPI (दुकानदार से पुष्टि के बाद)</option><option>Pickup — दुकान से लें</option></select>
-  <button class="order" onclick="sendOrder()">WhatsApp पर ऑर्डर भेजें</button>
-  <div class="note">डेमो कैटलॉग: अभी दिए गए नमूना प्रोडक्ट और कीमतें बदलनी होंगी। ऑर्डर WhatsApp पर जाएगा; ऑनलाइन पेमेंट अपने-आप नहीं कटेगा।</div>
- </section>
-</main>
-<footer>PatnaKart · पटना का अपना ऑनलाइन बाजार · पटना, बिहार</footer>
-<script>
-const WHATSAPP_NUMBER = "919508562740"; // दुकान का WhatsApp नंबर; बदलने के लिए यहाँ संपादित करें
-const items = [
- {id:1,name:"वेज पिज़्ज़ा",cat:"खाना",price:199,emoji:"🍕",desc:"ताज़ा बेक किया हुआ"},
- {id:2,name:"चीज़ बर्गर",cat:"खाना",price:99,emoji:"🍔",desc:"स्नैक और मील"},
- {id:3,name:"मसाला मोमोज",cat:"खाना",price:89,emoji:"🥟",desc:"स्टीम्ड मोमोज"},
- {id:4,name:"कोल्ड कॉफी",cat:"खाना",price:79,emoji:"🥤",desc:"ठंडी और क्रीमी"},
- {id:5,name:"कॉटन टी-शर्ट",cat:"फैशन",price:299,emoji:"👕",desc:"साइज़ और रंग पूछें"},
- {id:6,name:"महिला कुर्ती",cat:"फैशन",price:499,emoji:"👗",desc:"डेली वियर"},
- {id:7,name:"कैजुअल शूज़",cat:"जूते",price:699,emoji:"👟",desc:"आरामदायक फुटवियर"},
- {id:8,name:"हैंडबैग",cat:"फैशन",price:399,emoji:"👜",desc:"रोज़मर्रा के इस्तेमाल के लिए"},
- {id:9,name:"स्पोर्ट्स शूज़",cat:"जूते",price:899,emoji:"👟",desc:"डेमो प्रोडक्ट — साइज़ चुनें"},
- {id:10,name:"फेस वॉश",cat:"ब्यूटी",price:149,emoji:"🧴",desc:"डेमो प्रोडक्ट"},
- {id:11,name:"लिपस्टिक",cat:"ब्यूटी",price:199,emoji:"💄",desc:"डेमो प्रोडक्ट"},
- {id:12,name:"चावल 5 kg",cat:"किराना",price:320,emoji:"🍚",desc:"डेमो प्रोडक्ट"},
- {id:13,name:"फ्रूट जूस",cat:"किराना",price:60,emoji:"🧃",desc:"डेमो प्रोडक्ट"}
-];
-let active="सभी", cart={};
-const cats=["सभी","खाना","फैशन","जूते","ब्यूटी","किराना"];
-function money(n){return "₹"+n.toLocaleString("en-IN")}
-function renderCats(){document.getElementById("cats").innerHTML=cats.map(c=>`<button class="cat ${active===c?"active":""}" onclick="active='${c}';render()">${c}</button>`).join("")}
-function render(){
- renderCats();
- const q=document.getElementById("search").value.toLowerCase();
- const list=items.filter(p=>(active==="सभी"||p.cat===active)&&(p.name.toLowerCase().includes(q)||p.cat.toLowerCase().includes(q)));
- document.getElementById("count").textContent=list.length+" आइटम";
- document.getElementById("products").innerHTML=list.map(p=>`<article class="product"><div class="pic">${p.emoji}</div><div class="info"><div class="name">${p.name}</div><div class="desc">${p.desc}</div><div class="buyrow"><span class="price">${money(p.price)}</span><button class="add" onclick="add(${p.id})">+ Add</button></div></div></article>`).join("")||'<div class="empty">कोई प्रोडक्ट नहीं मिला।</div>';
- drawCart();
-}
-function add(id){cart[id]=(cart[id]||0)+1;drawCart()}
-function change(id,d){cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];drawCart()}
-function drawCart(){
- const chosen=items.filter(p=>cart[p.id]);
- const qty=Object.values(cart).reduce((a,b)=>a+b,0);
- const total=chosen.reduce((s,p)=>s+p.price*cart[p.id],0);
- document.getElementById("cartCount").textContent=qty?`(${qty} आइटम)`:"";
- document.getElementById("cart").innerHTML=chosen.length?chosen.map(p=>`<div class="cartline"><span>${p.name}<br><b>${money(p.price*cart[p.id])}</b></span><span class="qty"><button onclick="change(${p.id},-1)">−</button>${cart[p.id]}<button onclick="change(${p.id},1)">+</button></span></div>`).join(""):'<div class="empty">अभी कार्ट खाली है। प्रोडक्ट पर Add दबाएँ।</div>';
- document.getElementById("total").textContent=money(total);
-}
-function sendOrder(){
- const chosen=items.filter(p=>cart[p.id]);
- if(!chosen.length){alert("पहले कार्ट में प्रोडक्ट जोड़ें।");return}
- const name=document.getElementById("customer").value.trim(), phone=document.getElementById("phone").value.trim(), address=document.getElementById("address").value.trim(), payment=document.getElementById("payment").value;
- if(!name||!phone||!address){alert("कृपया नाम, मोबाइल नंबर और पता भरें।");return}
- const total=chosen.reduce((s,p)=>s+p.price*cart[p.id],0);
- const lines=chosen.map(p=>`${p.name} x ${cart[p.id]} = ${money(p.price*cart[p.id])}`).join("\n");
- const msg=`नया ऑर्डर — PatnaKart\nनाम: ${name}\nग्राहक मोबाइल: ${phone}\nपता: ${address}\n\n${lines}\n\nकुल: ${money(total)}\nऑर्डर तरीका: ${payment}\n\nकृपया ऑर्डर की पुष्टि करें।`;
- if(!/^\d{10,13}$/.test(WHATSAPP_NUMBER)){alert("दुकान का WhatsApp नंबर कोड में सही करें।");return}
- window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`,"_blank");
-}
-render();
-</script>
+  <p>PatnaKart खुल रहा है...</p>
+  <a href="patnakart_step3_categories-1.html">यहाँ क्लिक करें</a>
 </body>
 </html>
