@@ -1,0 +1,6 @@
+{
+  "appId": "com.patnakart.app",
+  "appName": "PatnaKart",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
