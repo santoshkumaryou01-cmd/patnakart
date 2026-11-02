@@ -55,12 +55,39 @@ footer{background:#172554;color:white;text-align:center;padding:20px}
 </h2>
 
 <div class="cartbox" id="cartbox" style="display:none">
-<h3>आपका Shopping Cart</h3>
-<div id="cartlist"></div>
-<p class="total">Total: ₹<span id="total">0</span></p>
-<button onclick="alert('Checkout का अगला चरण जल्द जोड़ेंगे!')">
-Proceed to Checkout
-</button>
+  <h3>आपका Shopping Cart</h3>
+  <div id="cartlist"></div>
+  <p class="total">Total: ₹<span id="total">0</span></p>
+  <button onclick="openCheckout()">
+    Proceed to Checkout
+  </button>
+</div>
+
+<div class="cartbox" id="checkoutbox" style="display:none">
+  <h3>Customer Details</h3>
+
+  <form id="checkoutForm" onsubmit="placeOrder(event)">
+    <p>आपका नाम</p>
+    <input id="customerName" type="text" required placeholder="पूरा नाम">
+
+    <p>मोबाइल नंबर</p>
+    <input id="customerPhone" type="tel" required
+      pattern="[0-9]{10}" placeholder="10 अंकों का नंबर">
+
+    <p>डिलीवरी का पूरा पता</p>
+    <textarea id="customerAddress" required
+      placeholder="घर नंबर, मोहल्ला, शहर"></textarea>
+
+    <p>पेमेंट का तरीका</p>
+    <select id="paymentMethod">
+      <option value="Cash on Delivery">Cash on Delivery</option>
+    </select>
+
+    <button type="submit">Confirm Order on WhatsApp</button>
+    <button type="button" onclick="closeCheckout()">Back to Cart</button>
+  </form>
+
+  <p id="orderStatus"></p>
 </div>
 
 <footer>
@@ -108,6 +135,65 @@ delete cart[id];
 updateCart();
 }
 
+function openCheckout(){
+  let hasItems = Object.values(cart).some(qty => qty > 0);
+
+  if(!hasItems){
+    alert("पहले Cart में सामान जोड़ें।");
+    return;
+  }
+
+  document.getElementById("cartbox").style.display = "none";
+  document.getElementById("checkoutbox").style.display = "block";
+}
+
+function closeCheckout(){
+  document.getElementById("checkoutbox").style.display = "none";
+  document.getElementById("cartbox").style.display = "block";
+}
+
+function placeOrder(event){
+  event.preventDefault();
+
+  let name = document.getElementById("customerName").value.trim();
+  let phone = document.getElementById("customerPhone").value.trim();
+  let address = document.getElementById("customerAddress").value.trim();
+  let payment = document.getElementById("paymentMethod").value;
+
+  let total = 0;
+  let items = "";
+
+  products.forEach(p => {
+    let qty = cart[p.id] || 0;
+    if(qty > 0){
+      total += p.price * qty;
+      items += p.name + " x " + qty + " = ₹" + (p.price * qty) + "\n";
+    }
+  });
+
+  if(total === 0){
+    alert("आपका Cart खाली है।");
+    return;
+  }
+
+  let message =
+    "New PatnaKart Order\n\n" +
+    "Name: " + name + "\n" +
+    "Phone: " + phone + "\n" +
+    "Address: " + address + "\n\n" +
+    "Items:\n" + items +
+    "\nTotal: ₹" + total +
+    "\nPayment: " + payment;
+
+  document.getElementById("orderStatus").textContent =
+    "WhatsApp खुलने पर Send दबाकर ऑर्डर भेजें।";
+
+  let url = "https://wa.me/919508562740?text=" +
+    encodeURIComponent(message);
+
+  window.open(url, "_blank");
+    }
+  
 function updateCart(){
 let count=0,total=0;
 let html="";
