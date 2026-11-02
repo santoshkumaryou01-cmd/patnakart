@@ -1,0 +1,12 @@
+{
+  "name": "patnakart",
+  "version": "1.0.0",
+  "description": "PatnaKart Shopping App",
+  "private": true,
+  "scripts": {
+    "start": "echo PatnaKart"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.0.0"
+  }
+}
