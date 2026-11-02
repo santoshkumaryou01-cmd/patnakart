@@ -1,2 +1,85 @@
-# PatnaKart
-पटना का अपना ऑनलाइन बाजार।
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PatnaKart - Online Shopping</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f5f6fa;color:#222}
+header{background:#172554;color:white;padding:18px}
+header h1{margin:0;color:#facc15}
+header p{margin:5px 0}
+.search{padding:15px}
+.search input{width:100%;padding:13px;border:1px solid #ddd;border-radius:9px}
+h2{padding:0 15px;font-size:20px}
+.categories,.products{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:12px}
+.category,.product{background:white;border-radius:12px;padding:16px;text-align:center;box-shadow:0 2px 8px #ddd}
+.category{font-weight:bold}
+.emoji{font-size:38px}
+.product button{background:#172554;color:white;border:0;padding:10px 18px;border-radius:7px}
+.price{color:#15803d;font-weight:bold}
+footer{text-align:center;padding:25px;background:#172554;color:white;margin-top:20px}
+</style>
+</head>
+<body>
+<header>
+<h1>🛍️ PatnaKart</h1>
+<p>पटना का अपना ऑनलाइन बाजार</p>
+</header>
+<div class="search">
+<input type="search" placeholder="आप क्या खरीदना चाहते हैं?">
+</div>
+<h2>Shop by Category</h2>
+<div class="categories">
+<div class="category"><div class="emoji">👕</div>कपड़े</div>
+<div class="category"><div class="emoji">👟</div>जूते</div>
+<div class="category"><div class="emoji">🕶️</div>चश्मे</div>
+<div class="category"><div class="emoji">⌚</div>घड़ी</div>
+<div class="category"><div class="emoji">👜</div>बेल्ट और बैग</div>
+<div class="category"><div class="emoji">✨</div>नए प्रोडक्ट</div>
+</div>
+<h2>Featured Products</h2>
+<div class="products">
+<div class="product">
+<div class="emoji">👕</div>
+<h3>Men's T-Shirt</h3>
+<p class="price">₹299</p>
+<button onclick="addCart('Men T-Shirt')">Add to Cart</button>
+</div>
+<div class="product">
+<div class="emoji">👟</div>
+<h3>Casual Shoes</h3>
+<p class="price">₹799</p>
+<button onclick="addCart('Casual Shoes')">Add to Cart</button>
+</div>
+<div class="product">
+<div class="emoji">🕶️</div>
+<h3>Fashion Sunglasses</h3>
+<p class="price">₹249</p>
+<button onclick="addCart('Sunglasses')">Add to Cart</button>
+</div>
+<div class="product">
+<div class="emoji">⌚</div>
+<h3>Stylish Watch</h3>
+<p class="price">₹499</p>
+<button onclick="addCart('Stylish Watch')">Add to Cart</button>
+</div>
+</div>
+<h2 id="cart">🛒 Cart: 0 Items</h2>
+<footer>
+<h3>PatnaKart</h3>
+<p>पटना का अपना ऑनलाइन बाजार।</p>
+<p>© 2026 PatnaKart</p>
+</footer>
+<script>
+let count=0;
+function addCart(name){
+count++;
+document.getElementById('cart').innerText='🛒 Cart: '+count+' Items';
+alert(name+' cart में जोड़ा गया!');
+}
+</script>
+</body>
+</html>
