@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="hi">
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PatnaKart Shopping</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#f4f5f9;color:#222}
+header{background:#172554;color:white;padding:18px}
+header h1{color:#facc15;margin:0}
+.search{padding:14px}
+input{width:100%;padding:13px;border:1px solid #ddd;border-radius:9px}
+h2{padding:0 14px}
+.categories,.products{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:12px}
+.category,.product,.cartbox{background:white;padding:14px;border-radius:12px;text-align:center;box-shadow:0 2px 7px #ddd}
+.emoji{font-size:38px}
+.price{color:green;font-weight:bold}
+button{background:#172554;color:white;border:0;border-radius:7px;padding:10px;margin:4px}
+.cartbox{margin:14px;text-align:left}
+.cartitem{border-bottom:1px solid #ddd;padding:12px 0}
+.cartitem button{padding:7px 12px}
+.total{font-size:20px;font-weight:bold;color:green}
+#cart{cursor:pointer}
+footer{background:#172554;color:white;text-align:center;padding:20px}
+</style>
+</head>
+<body>
+
+<header>
+<h1>🛍️ PatnaKart</h1>
+<p>पटना का अपना ऑनलाइन बाजार</p>
+</header>
+
+<div class="search">
+<input id="search" placeholder="प्रोडक्ट खोजें..." oninput="showProducts()">
+</div>
+
+<h2>Shop by Category</h2>
+<div class="categories">
+<div class="category">👕<p>कपड़े</p></div>
+<div class="category">👟<p>जूते</p></div>
+<div class="category">🕶️<p>चश्मे</p></div>
+<div class="category">⌚<p>घड़ी</p></div>
+<div class="category">👜<p>बैग और बेल्ट</p></div>
+<div class="category">✨<p>नए प्रोडक्ट</p></div>
+</div>
+
+<h2>Featured Products</h2>
+<div class="products" id="products"></div>
+
+<h2 id="cart" onclick="toggleCart()">
+🛒 My Cart (<span id="count">0</span>) — View Cart
+</h2>
+
+<div class="cartbox" id="cartbox" style="display:none">
+  <h3>आपका Shopping Cart</h3>
+  <div id="cartlist"></div>
+  <p class="total">Total: ₹<span id="total">0</span></p>
+  <button onclick="openCheckout()">
+    Proceed to Checkout
+  </button>
+</div>
+
+<div class="cartbox" id="checkoutbox" style="display:none">
+  <h3>Customer Details</h3>
+
+  <form id="checkoutForm" onsubmit="placeOrder(event)">
+    <p>आपका नाम</p>
+    <input id="customerName" type="text" required placeholder="पूरा नाम">
+
+    <p>मोबाइल नंबर</p>
+    <input id="customerPhone" type="tel" required
+      pattern="[0-9]{10}" placeholder="10 अंकों का नंबर">
+
+    <p>डिलीवरी का पूरा पता</p>
+    <textarea id="customerAddress" required
+      placeholder="घर नंबर, मोहल्ला, शहर"></textarea>
+
+    <p>पेमेंट का तरीका</p>
+    <select id="paymentMethod">
+      <option value="Cash on Delivery">Cash on Delivery</option>
+    </select>
+
+    <button type="submit">Confirm Order on WhatsApp</button>
+    <button type="button" onclick="closeCheckout()">Back to Cart</button>
+  </form>
+
+  <p id="orderStatus"></p>
+</div>
+
+<footer>
+<h3>PatnaKart</h3>
+<p>पटना का अपना ऑनलाइन बाजार।</p>
+</footer>
+
+<script>
+const products=[
+{id:1,name:"Men's T-Shirt",price:299,emoji:"👕"},
+{id:2,name:"Casual Shoes",price:799,emoji:"👟"},
+{id:3,name:"Fashion Sunglasses",price:249,emoji:"🕶️"},
+{id:4,name:"Stylish Watch",price:499,emoji:"⌚"},
+{id:5,name:"Fashion Belt",price:199,emoji:"🧷"},
+{id:6,name:"Travel Bag",price:599,emoji:"👜"}
+];
+
+let cart={};
+
+function showProducts(){
+let q=document.getElementById("search").value.toLowerCase();
+document.getElementById("products").innerHTML=
+products.filter(p=>p.name.toLowerCase().includes(q)).map(p=>`
+<div class="product">
+<div class="emoji">${p.emoji}</div>
+<h3>${p.name}</h3>
+<p class="price">₹${p.price}</p>
+<button onclick="addCart(${p.id})">Add to Cart</button>
+</div>`).join("");
+}
+
+function addCart(id){
+cart[id]=(cart[id]||0)+1;
+updateCart();
+}
+
+function changeQty(id,change){
+cart[id]=(cart[id]||0)+change;
+if(cart[id]<=0) delete cart[id];
+updateCart();
+}
+
+function removeItem(id){
+delete cart[id];
+updateCart();
+}
+
+function openCheckout(){
+  let hasItems = Object.values(cart).some(qty => qty > 0);
+
+  if(!hasItems){
+    alert("पहले Cart में सामान जोड़ें।");
+    return;
+  }
+
+  document.getElementById("cartbox").style.display = "none";
+  document.getElementById("checkoutbox").style.display = "block";
+}
+
+function closeCheckout(){
+  document.getElementById("checkoutbox").style.display = "none";
+  document.getElementById("cartbox").style.display = "block";
+}
+
+function placeOrder(event){
+  event.preventDefault();
+
+  let name = document.getElementById("customerName").value.trim();
+  let phone = document.getElementById("customerPhone").value.trim();
+  let address = document.getElementById("customerAddress").value.trim();
+  let payment = document.getElementById("paymentMethod").value;
+
+  let total = 0;
+  let items = "";
+
+  products.forEach(p => {
+    let qty = cart[p.id] || 0;
+    if(qty > 0){
+      total += p.price * qty;
+      items += p.name + " x " + qty + " = ₹" + (p.price * qty) + "\n";
+    }
+  });
+
+  if(total === 0){
+    alert("आपका Cart खाली है।");
+    return;
+  }
+
+  let message =
+    "New PatnaKart Order\n\n" +
+    "Name: " + name + "\n" +
+    "Phone: " + phone + "\n" +
+    "Address: " + address + "\n\n" +
+    "Items:\n" + items +
+    "\nTotal: ₹" + total +
+    "\nPayment: " + payment;
+
+  document.getElementById("orderStatus").textContent =
+    "WhatsApp खुलने पर Send दबाकर ऑर्डर भेजें।";
+
+  let url = "https://wa.me/919508562740?text=" +
+    encodeURIComponent(message);
+
+  window.open(url, "_blank");
+    }
+  
+function updateCart(){
+let count=0,total=0;
+let html="";
+products.forEach(p=>{
+let qty=cart[p.id]||0;
+if(qty>0){
+count+=qty;
+total+=p.price*qty;
+html+=`
+<div class="cartitem">
+<strong>${p.emoji} ${p.name}</strong>
+<p>Price: ₹${p.price}</p>
+<button onclick="changeQty(${p.id},-1)">−</button>
+${qty}
+<button onclick="changeQty(${p.id},1)">+</button>
+<button onclick="removeItem(${p.id})">Remove</button>
+<p>Subtotal: ₹${p.price*qty}</p>
+</div>`;
+}
+});
+document.getElementById("count").innerText=count;
+document.getElementById("cartlist").innerHTML=
+html||"आपका Cart अभी खाली है।";
+document.getElementById("total").innerText=total;
+}
+
+function toggleCart(){
+let box=document.getElementById("cartbox");
+box.style.display=box.style.display==="none"?"block":"none";
+updateCart();
+}
+
+showProducts();
+updateCart();
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+</script>
+</body>
+</html>
