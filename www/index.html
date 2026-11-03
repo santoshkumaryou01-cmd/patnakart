@@ -245,6 +245,101 @@ appId:
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+async function adminLoginUser() {
+  const email = document.getElementById("adminEmail").value.trim();
+  const password = document.getElementById("adminPassword").value;
+  const msg = document.getElementById("adminMessage");
+
+  try {
+    const result = await firebase.auth().signInWithEmailAndPassword(email, password);
+    const uid = result.user.uid;
+    const doc = await db.collection("admins").doc(uid).get();
+
+    if (!doc.exists) {
+      await firebase.auth().signOut();
+      msg.innerText = "आप Admin नहीं हैं।";
+      return;
+    }
+
+    document.getElementById("adminLogin").style.display = "none";
+    document.getElementById("adminPanel").style.display = "block";
+    loadAdminProducts();
+
+  } catch (error) {
+    msg.innerText = error.message;
+  }
+}
+
+async function adminLogout() {
+  await firebase.auth().signOut();
+  document.getElementById("adminPanel").style.display = "none";
+  document.getElementById("adminLogin").style.display = "block";
+}
+
+async function addNewProduct() {
+  const name = document.getElementById("newProductName").value.trim();
+  const price = Number(document.getElementById("newProductPrice").value);
+  const emoji = document.getElementById("newProductEmoji").value.trim();
+
+  if (!name || !Number.isFinite(price) || price <= 0) {
+    alert("सही Product Name और Price डालें।");
+    return;
+  }
+
+  try {
+    await db.collection("products").add({
+      name,
+      price,
+      emoji: emoji || "🛍️",
+      status: "approved"
+    });
+    alert("Product Added!");
+    loadAdminProducts();
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+async function loadAdminProducts() {
+  const box = document.getElementById("adminProducts");
+  try {
+    const snapshot = await db.collection("products").get();
+    box.innerHTML = "<h3>Products</h3>";
+
+    snapshot.forEach(doc => {
+      const p = doc.data();
+      const item = document.createElement("div");
+      item.className = "cartitem";
+
+      const name = document.createElement("strong");
+      name.textContent = p.name || "Unnamed Product";
+
+      const price = document.createElement("p");
+      price.textContent = "Price: ₹" + (p.price || 0);
+
+      const btn = document.createElement("button");
+      btn.textContent = "Delete";
+      btn.onclick = () => deleteAdminProduct(doc.id);
+
+      item.append(name, price, btn);
+      box.appendChild(item);
+    });
+  } catch (error) {
+    box.textContent = error.message;
+  }
+}
+
+async function deleteAdminProduct(id) {
+  if (!confirm("क्या आप यह Product Delete करना चाहते हैं?")) return;
+  try {
+    await db.collection("products").doc(id).delete();
+    loadAdminProducts();
+  } catch (error) {
+    alert(error.message);
+  }
+}
+  
 </script>
 </body>
 </html>
