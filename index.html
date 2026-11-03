@@ -94,6 +94,57 @@ footer{background:#172554;color:white;text-align:center;padding:20px}
   <p id="orderStatus"></p>
 </div>
 
+<div class="cartbox" id="adminLogin">
+  <h2>🔐 Admin Login</h2>
+
+  <input id="adminEmail" type="email"
+    placeholder="Admin Email">
+
+  <br><br>
+
+  <input id="adminPassword" type="password"
+    placeholder="Admin Password">
+
+  <br><br>
+
+  <button onclick="adminLoginUser()">
+    Login
+  </button>
+
+  <p id="adminMessage"></p>
+</div>
+
+<div class="cartbox" id="adminPanel" style="display:none">
+  <h2>⚙️ PatnaKart Admin Panel</h2>
+
+  <h3>Add New Product</h3>
+
+  <input id="newProductName"
+    placeholder="Product Name">
+
+  <br><br>
+
+  <input id="newProductPrice"
+    type="number" placeholder="Product Price">
+
+  <br><br>
+
+  <input id="newProductEmoji"
+    placeholder="Product Emoji">
+
+  <br><br>
+
+  <button onclick="addNewProduct()">
+    Add Product
+  </button>
+
+  <button onclick="adminLogout()">
+    Logout
+  </button>
+
+  <div id="adminProducts"></div>
+</div>
+  
 <footer>
 <h3>PatnaKart</h3>
 <p>पटना का अपना ऑनलाइन बाजार।</p>
@@ -235,6 +286,106 @@ updateCart();
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+async function adminLoginUser() {
+  const email = document.getElementById("adminEmail").value.trim();
+  const password = document.getElementById("adminPassword").value;
+
+  const msg = document.getElementById("adminMessage");
+
+  try {
+    const result = await firebase.auth().signInWithEmailAndPassword(email, password);
+    const uid = result.user.uid;
+
+    const adminDoc = await db.collection("admins").doc(uid).get();
+
+    if (!adminDoc.exists) {
+      await firebase.auth().signOut();
+      msg.innerText = "आप Admin नहीं हैं।";
+      return;
+    }
+
+    document.getElementById("adminLogin").style.display = "none";
+    document.getElementById("adminPanel").style.display = "block";
+    msg.innerText = "Admin Login Successful";
+    loadAdminProducts();
+
+  } catch (error) {
+    msg.innerText = "Login Error: " + error.message;
+  }
+}
+
+async function adminLogout() {
+  await firebase.auth().signOut();
+  document.getElementById("adminPanel").style.display = "none";
+  document.getElementById("adminLogin").style.display = "block";
+}
+
+async function addNewProduct() {
+  const name = document.getElementById("newProductName").value.trim();
+  const price = Number(document.getElementById("newProductPrice").value);
+  const emoji = document.getElementById("newProductEmoji").value.trim();
+
+  if (!name || !price || price <= 0) {
+    alert("Product Name और सही Price डालें।");
+    return;
+  }
+
+  try {
+    await db.collection("products").add({
+      name: name,
+      price: price,
+      emoji: emoji || "🛍️",
+      status: "approved"
+    });
+
+    alert("Product Added Successfully!");
+    loadAdminProducts();
+
+  } catch (error) {
+    alert("Error: " + error.message);
+  }
+}
+
+async function loadAdminProducts() {
+  const box = document.getElementById("adminProducts");
+
+  try {
+    const snapshot = await db.collection("products").get();
+
+    box.innerHTML = "<h3>Products</h3>";
+
+    snapshot.forEach(doc => {
+      const p = doc.data();
+
+      box.innerHTML += `
+        <div class="cartitem">
+          <strong>${p.name}</strong>
+          <p>Price: ₹${p.price}</p>
+          <button onclick="deleteAdminProduct('${doc.id}')">
+            Delete
+          </button>
+        </div>`;
+    });
+
+  } catch (error) {
+    box.innerText = "Error: " + error.message;
+  }
+}
+
+async function deleteAdminProduct(id) {
+  if (!confirm("क्या आप यह Product Delete करना चाहते हैं?")) return;
+
+  try {
+    await db.collection("products").doc(id).delete();
+    loadAdminProducts();
+    alert("Product Deleted!");
+
+  } catch (error) {
+    alert("Delete Error: " + error.message);
+  }
+}
+  
 </script>
 </body>
 </html>
