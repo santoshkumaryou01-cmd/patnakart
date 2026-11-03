@@ -93,6 +93,30 @@ footer{background:#172554;color:white;text-align:center;padding:20px}
   <p id="orderStatus"></p>
 </div>
 
+<div class="cartbox" id="adminLogin">
+  <h2>🔐 Admin Login</h2>
+  <input id="adminEmail" type="email" placeholder="Admin Email">
+  <br><br>
+  <input id="adminPassword" type="password" placeholder="Admin Password">
+  <br><br>
+  <button onclick="adminLoginUser()">Login</button>
+  <p id="adminMessage"></p>
+</div>
+
+<div class="cartbox" id="adminPanel" style="display:none">
+  <h2>⚙️ PatnaKart Admin Panel</h2>
+  <h3>Add New Product</h3>
+  <input id="newProductName" placeholder="Product Name">
+  <br><br>
+  <input id="newProductPrice" type="number" placeholder="Product Price">
+  <br><br>
+  <input id="newProductEmoji" placeholder="Product Emoji">
+  <br><br>
+  <button onclick="addNewProduct()">Add Product</button>
+  <button onclick="adminLogout()">Logout</button>
+  <div id="adminProducts"></div>
+</div>
+  
 <footer>
 <h3>PatnaKart</h3>
 <p>पटना का अपना ऑनलाइन बाजार।</p>
